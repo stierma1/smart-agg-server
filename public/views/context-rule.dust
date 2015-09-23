@@ -1,0 +1,12 @@
+
+<tr>
+  <td>
+    {predicate.raw}
+  <td>
+  <td>
+    {groundings}
+  <td>
+  <td>
+    {provider}
+  <td>
+</tr>

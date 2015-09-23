@@ -1,0 +1,14 @@
+{
+  "name": "smart-agg-server",
+  "main": "index.js",
+  "version": "0.0.0",
+  "homepage": "https://github.com/stierma1/smart-agg-server",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
