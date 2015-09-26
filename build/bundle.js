@@ -59,6 +59,17 @@
 	__webpack_require__(7);
 	__webpack_require__(8);
 	__webpack_require__(9);
+	__webpack_require__(10);
+
+	$.get("/providers").success(function (data) {
+	  dust.render("views/providers", data, function (err, html) {
+	    if (err) {
+	      console.log(err);
+	    }
+
+	    $("#float-right").append(html);
+	  });
+	});
 
 	$.get("/rules").success(function (data) {
 	  dust.render("views/rules", { rules: data }, function (err, html) {
@@ -10672,6 +10683,13 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(dust) {module.exports = (function(dust){dust.register("views\/context-rule",body_0);function body_0(chk,ctx){return chk.w("<tr><td>").f(ctx.getPath(false, ["predicate","raw"]),ctx,"h").w("<td><td>").f(ctx.get(["groundings"], false),ctx,"h").w("<td><td>").f(ctx.get(["provider"], false),ctx,"h").w("<td></tr>");}body_0.__dustBody=!0;return body_0}(dust));
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(dust) {module.exports = (function(dust){dust.register("views\/providers",body_0);function body_0(chk,ctx){return chk.w("Providers<ul>").s(ctx.get(["providers"], false),ctx,{"block":body_1},{}).w("</ul>");}body_0.__dustBody=!0;function body_1(chk,ctx){return chk.w("<li>").f(ctx.getPath(true, []),ctx,"h").w("</li>");}body_1.__dustBody=!0;return body_0}(dust));
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }

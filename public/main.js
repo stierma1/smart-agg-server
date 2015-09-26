@@ -5,6 +5,18 @@ var $ = require("jquery");
 require("./views/rules.dust");
 require("./views/rule.dust");
 require("./views/context-rule.dust");
+require("./views/providers.dust");
+
+$.get("/providers")
+  .success((data) => {
+    dust.render("views/providers", data, function(err, html){
+      if(err){
+        console.log(err);
+      }
+
+      $("#float-right").append(html);
+    })
+  });
 
 $.get("/rules")
   .success((data) => {

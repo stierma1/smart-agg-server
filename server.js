@@ -31,6 +31,15 @@ app.get("/rules", function(req, res){
   res.status(200).json(rules);
 });
 
+app.get("/providers", function(req, res){
+  var currData = JSON.parse(myApp.serializeCurrentData());
+  var providers = [];
+  _.map(currData, function(val, providerKey){
+    providers.push(providerKey);
+  });
+  res.status(200).json({providers:providers});
+});
+
 app.post("/rules/:id", function(req, res){
   var rules = JSON.parse(myApp.serializeRules());
   rules[req.params.id] = req.body;
