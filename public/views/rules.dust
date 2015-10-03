@@ -1,4 +1,0 @@
-
-{#rules}
-  {> "views/rule" /}
-{/rules}

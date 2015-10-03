@@ -1,10 +1,9 @@
 
 var EZNotation = require("./easy-notation");
 var $ = require("jquery");
+require("bootstrap-webpack");
+var AggregationRule = require("./components/aggregation-rule/main");
 
-require("./views/rules.dust");
-require("./views/rule.dust");
-require("./views/context-rule.dust");
 require("./views/providers.dust");
 
 $.get("/providers")
@@ -20,13 +19,12 @@ $.get("/providers")
 
 $.get("/rules")
   .success((data) => {
-    dust.render("views/rules", {rules:data}, function(err, html){
-      if(err){
-        console.log(err);
-      }
-
-      $("#mount").append(html);
-    })
+    data.map((rule) => {
+      var agg = new AggregationRule(rule);
+      agg.initialized.then((aggO) => {
+        $("#mount").append(aggO.element);
+      });
+    });
   });
 
 document.getElementById("RuleBtn").addEventListener("click", processRule);

@@ -2,14 +2,16 @@
   <head>
     <!-- Do _not_  rely on this URL in production. Use only during development.  -->
   </head>
-  <body>
-    <div id="float-right" style="float:right" >
-
-    </div>
-    <span id="mount">
-    </span>
-    <div>
+  <body class="container">
+    <div class="row">
       <label for="Rule" >Rule</label> <textarea id="Rule"></textarea> <input type="button" value="+" id="RuleBtn" />
+    </div>
+    <div class="row">
+      <div id="float-right" style="float:right" class="col-md-2" >
+
+      </div>
+      <span id="mount" class="col-md-8">
+      </span>
     </div>
     <script src="/bundle.js"></script>
   </body>

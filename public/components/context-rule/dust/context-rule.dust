@@ -1,0 +1,12 @@
+
+<div id="{_instanceId}" class="context-rule row">
+  <div class="col-md-2">
+    {provider}
+  </div>
+  <div class="col-md-2">
+    {predicate.raw}
+  </div>
+  <div class="col-md-8">
+    {groundings}
+  </div>
+</div>
