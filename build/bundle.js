@@ -127,11 +127,17 @@
 	__webpack_require__(76);
 	var AggregationRule = __webpack_require__(99);
 	var GetModule = __webpack_require__(109);
+	var ProviderMaker = __webpack_require__(111);
+
+	new ProviderMaker({}).initialized.then(function (pm) {
+	  $("#mount").append(pm.element);
+	});
 
 	new GetModule({}).initialized.then(function (gm) {
 	  $("#mount").append(gm.element);
 	});
-	__webpack_require__(111);
+
+	__webpack_require__(113);
 
 	$.get("/providers").success(function (data) {
 	  dust.render("views/providers", data, function (err, html) {
@@ -31402,7 +31408,7 @@
 	    value: function testModule() {
 	      var _this4 = this;
 
-	      $("#" + this._data._instanceId + "-module-state").html("Testing");
+	      $("#" + this._data._instanceId + "-module-status").html("Testing");
 	      var val = $("#" + this._data._instanceId + "-module-text").val();
 	      $.post("/modules/" + val + "?test=true").success(function () {
 	        $("#" + _this4._data._instanceId + "-module-status").html("Pass");
@@ -31415,7 +31421,7 @@
 	    value: function getModule() {
 	      var _this5 = this;
 
-	      $("#" + this._data._instanceId + "-module-state").html("Testing");
+	      $("#" + this._data._instanceId + "-module-status").html("Getting");
 	      var val = $("#" + this._data._instanceId + "-module-text").val();
 	      $.post("/modules/" + val).success(function () {
 	        $("#" + _this5._data._instanceId + "-module-status").html("Pass");
@@ -31440,6 +31446,112 @@
 
 /***/ },
 /* 111 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(dust) {"use strict";
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var $ = __webpack_require__(75);
+	var _ = __webpack_require__(100);
+	var Bluebird = __webpack_require__(102);
+	var uuid = __webpack_require__(104);
+
+	var ProviderMaker = (function () {
+	  function ProviderMaker(data) {
+	    var _this = this;
+
+	    _classCallCheck(this, ProviderMaker);
+
+	    this._data = _.extend(data, { _instanceId: uuid.v4().replace(/-/g, "") });
+	    this.element = null;
+	    this.initialized = this.render().then(function (element) {
+	      _this.element = element;
+	      return _this;
+	    });
+	  }
+
+	  _createClass(ProviderMaker, [{
+	    key: "render",
+	    value: function render() {
+	      var _this2 = this;
+
+	      var template = __webpack_require__(112);
+	      var defer = Bluebird.defer();
+
+	      dust.render(template, this._data, function (err, html) {
+	        if (err) {
+	          defer.reject(err);
+	          return;
+	        }
+	        defer.resolve(_this2._bind(html));
+	      });
+
+	      return defer.promise.then(function (element) {
+	        return _this2._inject(element);
+	      });
+	    }
+	  }, {
+	    key: "update",
+	    value: function update() {}
+	  }, {
+	    key: "hide",
+	    value: function hide() {}
+	  }, {
+	    key: "_bind",
+	    value: function _bind(html) {
+	      var _this3 = this;
+
+	      var element = $(html);
+	      element.find("#" + this._data._instanceId + "-provider-make").click(function () {
+	        _this3.makeProvider();
+	      });
+	      //element.find("#" + this._data._instanceId + "-module-get").click(()=> {this.getModule()});
+	      return element;
+	    }
+	  }, {
+	    key: "_inject",
+	    value: function _inject(element) {
+	      return element;
+	    }
+	  }, {
+	    key: "_unload",
+	    value: function _unload() {}
+	  }, {
+	    key: "makeProvider",
+	    value: function makeProvider() {
+	      var _this4 = this;
+
+	      $("#" + this._data._instanceId + "-provider-status").html("Making");
+	      var id = $("#" + this._data._instanceId + "-provider-id").val();
+	      var mod = $("#" + this._data._instanceId + "-provider-module").val();
+	      var persist = $("#" + this._data._instanceId + "-provider-persist").val() === "on";
+	      var config = $("#" + this._data._instanceId + "-provider-config").val();
+	      $.post("/instances/" + id, { id: id, module: mod, persist: persist, config: JSON.parse(config) }).success(function () {
+	        window.location.reload();
+	      }).fail(function (err) {
+	        $("#" + _this4._data._instanceId + "-provider-status").html(err.responseText || err.message || err);
+	      });
+	    }
+	  }]);
+
+	  return ProviderMaker;
+	})();
+
+	module.exports = ProviderMaker;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(71)))
+
+/***/ },
+/* 112 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(dust) {module.exports = (function(dust){dust.register("components\/provider-maker\/dust\/provider-maker",body_0);function body_0(chk,ctx){return chk.w("<div id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("\" class=\"provider-maker\"><h3 class=\"\">Create Provider</h3><label>Module: <input class=\"\" type=\"text\" id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-provider-module\" /></label><label>Id: <input class=\"\" type=\"text\" id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-provider-id\" /></label><label>Persist: <input class=\"\" type=\"checkbox\" id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-provider-persist\" /></label><input type=\"button\" class=\"\" value=\"Make\" id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-provider-make\"/><label>Configuration: <textarea id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-provider-config\"></textarea></label><div id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-provider-status\"></div></div>");}body_0.__dustBody=!0;return body_0}(dust));
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(71)))
+
+/***/ },
+/* 113 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(dust) {module.exports = (function(dust){dust.register("views\/providers",body_0);function body_0(chk,ctx){return chk.w("Providers<ul>").s(ctx.get(["providers"], false),ctx,{"block":body_1},{}).w("</ul>");}body_0.__dustBody=!0;function body_1(chk,ctx){return chk.w("<li>").f(ctx.getPath(true, []),ctx,"h").w("</li>");}body_1.__dustBody=!0;return body_0}(dust));

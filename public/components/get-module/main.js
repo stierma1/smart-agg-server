@@ -56,7 +56,7 @@ class GetModule {
   }
 
   testModule(){
-    $("#" + this._data._instanceId + "-module-state").html("Testing");
+    $("#" + this._data._instanceId + "-module-status").html("Testing");
     var val = $("#" + this._data._instanceId + "-module-text").val();
     $.post("/modules/" + val + "?test=true").success(() => {
       $("#" + this._data._instanceId + "-module-status").html("Pass");
@@ -67,7 +67,7 @@ class GetModule {
   }
 
   getModule(){
-    $("#" + this._data._instanceId + "-module-state").html("Testing");
+    $("#" + this._data._instanceId + "-module-status").html("Getting");
     var val = $("#" + this._data._instanceId + "-module-text").val();
     $.post("/modules/" + val).success(() => {
       $("#" + this._data._instanceId + "-module-status").html("Pass");

@@ -1,0 +1,22 @@
+
+<div id="{_instanceId}" class="provider-maker">
+  <h3 class="">
+    Create Provider
+  </h3>
+  <label>
+    Module: <input class="" type="text" id="{_instanceId}-provider-module" />
+  </label>
+  <label>
+    Id: <input class="" type="text" id="{_instanceId}-provider-id" />
+  </label>
+  <label>
+    Persist: <input class="" type="checkbox" id="{_instanceId}-provider-persist" />
+  </label>
+  <input type="button" class="" value="Make" id="{_instanceId}-provider-make"/>
+  <label>
+    Configuration: <textarea id="{_instanceId}-provider-config"></textarea>
+  </label>
+  <div id="{_instanceId}-provider-status">
+
+  </div>
+</div>

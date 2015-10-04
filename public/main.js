@@ -4,11 +4,18 @@ var $ = require("jquery");
 require("bootstrap-webpack");
 var AggregationRule = require("./components/aggregation-rule/main");
 var GetModule = require("./components/get-module/main");
+var ProviderMaker = require("./components/provider-maker/main");
+
+(new ProviderMaker({})).initialized
+  .then((pm) => {
+    $("#mount").append(pm.element);
+  });
 
 (new GetModule({})).initialized
   .then((gm) => {
     $("#mount").append(gm.element);
   });
+
 require("./views/providers.dust");
 
 $.get("/providers")

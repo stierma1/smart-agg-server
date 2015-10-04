@@ -8,6 +8,7 @@ var Pulse = require("./lib/pulse");
 var config = require("./config");
 var ModFetch = require("./lib/module-fetch");
 var Modules = require("./lib/modules");
+var InstanceMaker = require("./lib/instance-maker");
 
 var app = express();
 
@@ -17,9 +18,7 @@ var myApp = new Application({
   interfaces:config.interfaces || {}
 });
 
-var getRoutes = [];
-var postRoutes = [];
-
+var instanceMaker = new InstanceMaker(myApp);
 
 app.use(bodyParser())
 
@@ -71,8 +70,22 @@ app.post("/modules/:moduleText", function(req, res){
   }
 });
 
+app.post("/instances/:id", function(req, res){
+  var result = instanceMaker.make(req.body);
+  if(result){
+    res.status(200).end();
+  } else {
+    res.status(400).send("Module Name not found");
+  }
+});
+
 app.use("/index.html",express.static(__dirname + "/public/index.html"));
 app.use(express.static(__dirname + "/build"));
+
+glob.sync("./instances/*.json")
+  .map(function(file){
+    instanceMaker.make(require(file));
+  });
 
 app.listen(config.port || 3001);
 
