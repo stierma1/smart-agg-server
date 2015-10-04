@@ -7,7 +7,6 @@ module.exports = {
     },
     resolve: {
       alias: {
-        "react": __dirname + "/node_modules/react/dist/react-with-addons.js",
         'dustjs': "dustjs-linkedin",
         'dust': "dustjs-linkedin"
       },
@@ -18,7 +17,7 @@ module.exports = {
         filename: "bundle.js"
     },
     externals:{
-      'falcor': "falcor"
+
     },
     plugins: [
       new webpack.ProvidePlugin({

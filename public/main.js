@@ -3,7 +3,12 @@ var EZNotation = require("./easy-notation");
 var $ = require("jquery");
 require("bootstrap-webpack");
 var AggregationRule = require("./components/aggregation-rule/main");
+var GetModule = require("./components/get-module/main");
 
+(new GetModule({})).initialized
+  .then((gm) => {
+    $("#mount").append(gm.element);
+  });
 require("./views/providers.dust");
 
 $.get("/providers")
@@ -12,7 +17,6 @@ $.get("/providers")
       if(err){
         console.log(err);
       }
-
       $("#float-right").append(html);
     })
   });

@@ -1,0 +1,12 @@
+
+<div id="{_instanceId}" class="get-module row">
+  <label class="col-md-2">
+    Get Module
+  </label>
+  <input class="col-md-4" type="text" id="{_instanceId}-module-text" />
+  <input type="button" class="col-md-1" value="test" id="{_instanceId}-module-test"/>
+  <input type="button" class="col-md-1" value="get" id="{_instanceId}-module-get" />
+  <div id="{_instanceId}-module-status">
+
+  </div>
+</div>

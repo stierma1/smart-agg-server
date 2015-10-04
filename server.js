@@ -6,6 +6,8 @@ var Application = require("smart-agg");
 var _ = require("lodash");
 var Pulse = require("./lib/pulse");
 var config = require("./config");
+var ModFetch = require("./lib/module-fetch");
+var Modules = require("./lib/modules");
 
 var app = express();
 
@@ -20,6 +22,10 @@ var postRoutes = [];
 
 
 app.use(bodyParser())
+
+app.get("/modules", function(req, res){
+  res.status(200).json(Modules.list());
+});
 
 app.get("/rules", function(req, res){
   var serialRules = JSON.parse(myApp.serializeRules());
@@ -45,6 +51,24 @@ app.post("/rules/:id", function(req, res){
   rules[req.params.id] = req.body;
   myApp.loadRules(JSON.stringify(rules));
   res.status(200).end();
+});
+
+app.post("/modules/:moduleText", function(req, res){
+  if(req.query.test){
+    var val = ModFetch.test(req.params.moduleText);
+    if(val.status === 0){
+      res.status(200).send(val.stdout);
+    } else {
+      res.status(400).send(val.stderr);
+    }
+  } else {
+    var val = ModFetch.get(req.params.moduleText);
+    if(val.status === 0){
+      res.status(200).send(val.stdout);
+    } else {
+      res.status(400).send(val.stderr);
+    }
+  }
 });
 
 app.use("/index.html",express.static(__dirname + "/public/index.html"));
