@@ -1,0 +1,9 @@
+
+<div id="{_instanceId}">
+  <ul id="{_instanceId}-tab-list" class="nav nav-tabs list-inline">
+
+  </ul>
+  <div id="{_instanceId}-tab-content" class="tab-content">
+
+  </div>
+</div>

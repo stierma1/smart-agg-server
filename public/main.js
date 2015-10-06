@@ -2,18 +2,28 @@
 var EZNotation = require("./easy-notation");
 var $ = require("jquery");
 require("bootstrap-webpack");
-var AggregationRule = require("./components/aggregation-rule/main");
+var AggregationRuleList = require("./components/aggregation-rule-list/main");
 var GetModule = require("./components/get-module/main");
 var ProviderMaker = require("./components/provider-maker/main");
+var TabList = require("./components/tab-list/main");
+
+var tL = new TabList({});
+
+tL.initialized
+  .then((tL) => {
+    $("#mount").append(tL.element);
+    tL.addTab("Add Rule", "add-rule", $('<label for="Rule" >Rule</label> <textarea id="Rule"></textarea> <input type="button" value="+" id="RuleBtn" />'))
+    document.getElementById("RuleBtn").addEventListener("click", processRule);
+  });
 
 (new ProviderMaker({})).initialized
   .then((pm) => {
-    $("#mount").append(pm.element);
+    tL.addTab("Provider Maker", "provider-maker", pm.element);
   });
 
 (new GetModule({})).initialized
   .then((gm) => {
-    $("#mount").append(gm.element);
+    tL.addTab("Get Module", "get-module", gm.element);
   });
 
 require("./views/providers.dust");
@@ -30,15 +40,13 @@ $.get("/providers")
 
 $.get("/rules")
   .success((data) => {
-    data.map((rule) => {
-      var agg = new AggregationRule(rule);
-      agg.initialized.then((aggO) => {
-        $("#mount").append(aggO.element);
+    var aggL = new AggregationRuleList({rules:data || []});
+    aggL.initialized
+      .then(() => {
+        tL.addTab("Rules", "rules", aggL.element)
       });
-    });
   });
 
-document.getElementById("RuleBtn").addEventListener("click", processRule);
 
 function processRule(){
 

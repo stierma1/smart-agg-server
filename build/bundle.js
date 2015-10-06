@@ -125,19 +125,28 @@
 	var EZNotation = __webpack_require__(74);
 	var $ = __webpack_require__(75);
 	__webpack_require__(76);
-	var AggregationRule = __webpack_require__(99);
-	var GetModule = __webpack_require__(109);
-	var ProviderMaker = __webpack_require__(111);
+	var AggregationRuleList = __webpack_require__(99);
+	var GetModule = __webpack_require__(111);
+	var ProviderMaker = __webpack_require__(113);
+	var TabList = __webpack_require__(115);
+
+	var tL = new TabList({});
+
+	tL.initialized.then(function (tL) {
+	  $("#mount").append(tL.element);
+	  tL.addTab("Add Rule", "add-rule", $('<label for="Rule" >Rule</label> <textarea id="Rule"></textarea> <input type="button" value="+" id="RuleBtn" />'));
+	  document.getElementById("RuleBtn").addEventListener("click", processRule);
+	});
 
 	new ProviderMaker({}).initialized.then(function (pm) {
-	  $("#mount").append(pm.element);
+	  tL.addTab("Provider Maker", "provider-maker", pm.element);
 	});
 
 	new GetModule({}).initialized.then(function (gm) {
-	  $("#mount").append(gm.element);
+	  tL.addTab("Get Module", "get-module", gm.element);
 	});
 
-	__webpack_require__(113);
+	__webpack_require__(117);
 
 	$.get("/providers").success(function (data) {
 	  dust.render("views/providers", data, function (err, html) {
@@ -149,15 +158,11 @@
 	});
 
 	$.get("/rules").success(function (data) {
-	  data.map(function (rule) {
-	    var agg = new AggregationRule(rule);
-	    agg.initialized.then(function (aggO) {
-	      $("#mount").append(aggO.element);
-	    });
+	  var aggL = new AggregationRuleList({ rules: data || [] });
+	  aggL.initialized.then(function () {
+	    tL.addTab("Rules", "rules", aggL.element);
 	  });
 	});
-
-	document.getElementById("RuleBtn").addEventListener("click", processRule);
 
 	function processRule() {
 
@@ -13572,13 +13577,13 @@
 	var _ = __webpack_require__(100);
 	var Bluebird = __webpack_require__(102);
 	var uuid = __webpack_require__(104);
-	var ContextRule = __webpack_require__(106);
+	var AggregationRule = __webpack_require__(106);
 
-	var AggregationRule = (function () {
-	  function AggregationRule(data) {
+	var AggregationRuleList = (function () {
+	  function AggregationRuleList(data) {
 	    var _this = this;
 
-	    _classCallCheck(this, AggregationRule);
+	    _classCallCheck(this, AggregationRuleList);
 
 	    this._data = _.extend(data, { _instanceId: uuid.v4().replace(/-/, "") });
 	    this.element = null;
@@ -13588,12 +13593,12 @@
 	    });
 	  }
 
-	  _createClass(AggregationRule, [{
+	  _createClass(AggregationRuleList, [{
 	    key: "render",
 	    value: function render() {
 	      var _this2 = this;
 
-	      var template = __webpack_require__(108);
+	      var template = __webpack_require__(110);
 	      var defer = Bluebird.defer();
 
 	      dust.render(template, this._data, function (err, html) {
@@ -13622,30 +13627,19 @@
 	  }, {
 	    key: "_inject",
 	    value: function _inject(element) {
-	      var _this3 = this;
-
-	      var inputCtxRules = this._data.inputContexts.map(function (inputCtx) {
-	        return new ContextRule(inputCtx).initialized;
-	      });
-	      var resultCtxRules = this._data.resultContexts.map(function (resultCtx) {
-	        return new ContextRule(resultCtx).initialized;
+	      var aggRules = this._data.rules.map(function (aggRule) {
+	        return new AggregationRule(aggRule).initialized;
 	      });
 
-	      var iCtxPromise = Bluebird.all(inputCtxRules).then(function (iCtxRules) {
-	        iCtxRules.map(function (rule) {
+	      var aggProm = Bluebird.all(aggRules).then(function (aggRules) {
+	        aggRules.map(function (rule) {
 	          var li = $("<li></li>").append(rule.element);
-	          element.find("#" + _this3._data._instanceId + "-input-context-rules").append(li);
+
+	          element.append(li);
 	        });
 	      });
 
-	      var rCtxPromise = Bluebird.all(resultCtxRules).then(function (rCtxRules) {
-	        rCtxRules.map(function (rule) {
-	          var li = $("<li></li>").append(rule.element);
-	          element.find("#" + _this3._data._instanceId + "-result-context-rules").append(li);
-	        });
-	      });
-
-	      return Bluebird.all([iCtxPromise, rCtxPromise]).then(function () {
+	      return aggProm.then(function () {
 	        return element;
 	      });
 	    }
@@ -13654,10 +13648,10 @@
 	    value: function _unload() {}
 	  }]);
 
-	  return AggregationRule;
+	  return AggregationRuleList;
 	})();
 
-	module.exports = AggregationRule;
+	module.exports = AggregationRuleList;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(71)))
 
 /***/ },
@@ -31250,6 +31244,108 @@
 	var _ = __webpack_require__(100);
 	var Bluebird = __webpack_require__(102);
 	var uuid = __webpack_require__(104);
+	var ContextRule = __webpack_require__(107);
+
+	var AggregationRule = (function () {
+	  function AggregationRule(data) {
+	    var _this = this;
+
+	    _classCallCheck(this, AggregationRule);
+
+	    this._data = _.extend(data, { _instanceId: uuid.v4().replace(/-/, "") });
+	    this.element = null;
+	    this.initialized = this.render().then(function (element) {
+	      _this.element = element;
+	      return _this;
+	    });
+	  }
+
+	  _createClass(AggregationRule, [{
+	    key: "render",
+	    value: function render() {
+	      var _this2 = this;
+
+	      var template = __webpack_require__(109);
+	      var defer = Bluebird.defer();
+
+	      dust.render(template, this._data, function (err, html) {
+	        if (err) {
+	          defer.reject(err);
+	          return;
+	        }
+	        defer.resolve(_this2._bind(html));
+	      });
+
+	      return defer.promise.then(function (element) {
+	        return _this2._inject(element);
+	      });
+	    }
+	  }, {
+	    key: "update",
+	    value: function update() {}
+	  }, {
+	    key: "hide",
+	    value: function hide() {}
+	  }, {
+	    key: "_bind",
+	    value: function _bind(html) {
+	      return $(html);
+	    }
+	  }, {
+	    key: "_inject",
+	    value: function _inject(element) {
+	      var _this3 = this;
+
+	      var inputCtxRules = this._data.inputContexts.map(function (inputCtx) {
+	        return new ContextRule(inputCtx).initialized;
+	      });
+	      var resultCtxRules = this._data.resultContexts.map(function (resultCtx) {
+	        return new ContextRule(resultCtx).initialized;
+	      });
+
+	      var iCtxPromise = Bluebird.all(inputCtxRules).then(function (iCtxRules) {
+	        iCtxRules.map(function (rule) {
+	          var li = $("<li></li>").append(rule.element);
+	          element.find("#" + _this3._data._instanceId + "-input-context-rules").append(li);
+	        });
+	      });
+
+	      var rCtxPromise = Bluebird.all(resultCtxRules).then(function (rCtxRules) {
+	        rCtxRules.map(function (rule) {
+	          var li = $("<li></li>").append(rule.element);
+	          element.find("#" + _this3._data._instanceId + "-result-context-rules").append(li);
+	        });
+	      });
+
+	      return Bluebird.all([iCtxPromise, rCtxPromise]).then(function () {
+	        return element;
+	      });
+	    }
+	  }, {
+	    key: "_unload",
+	    value: function _unload() {}
+	  }]);
+
+	  return AggregationRule;
+	})();
+
+	module.exports = AggregationRule;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(71)))
+
+/***/ },
+/* 107 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(dust) {"use strict";
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var $ = __webpack_require__(75);
+	var _ = __webpack_require__(100);
+	var Bluebird = __webpack_require__(102);
+	var uuid = __webpack_require__(104);
 
 	var ContextRule = (function () {
 	  function ContextRule(data) {
@@ -31270,7 +31366,7 @@
 	    value: function render() {
 	      var _this2 = this;
 
-	      var template = __webpack_require__(107);
+	      var template = __webpack_require__(108);
 	      var defer = Bluebird.defer();
 
 	      dust.render(template, this._data, function (err, html) {
@@ -31313,21 +31409,28 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(71)))
 
 /***/ },
-/* 107 */
+/* 108 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(dust) {module.exports = (function(dust){dust.register("components\/context-rule\/dust\/context-rule",body_0);function body_0(chk,ctx){return chk.w("<div id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("\" class=\"context-rule row\"><div class=\"col-md-2\">").f(ctx.get(["provider"], false),ctx,"h").w("</div><div class=\"col-md-2\">").f(ctx.getPath(false, ["predicate","raw"]),ctx,"h").w("</div><div class=\"col-md-8\">").f(ctx.get(["groundings"], false),ctx,"h").w("</div></div>");}body_0.__dustBody=!0;return body_0}(dust));
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(71)))
 
 /***/ },
-/* 108 */
+/* 109 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(dust) {module.exports = (function(dust){dust.register("components\/aggregation-rule\/dust\/aggregation-rule",body_0);function body_0(chk,ctx){return chk.w("<span id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("\" ><div><h3>").f(ctx.get(["id"], false),ctx,"h").w("</h3><div class=\"context-rules\" ><label>Input Context Rules</label><div class=\"container\"><div class=\"row\"><label class=\"col-md-2\">Provider</label><label class=\"col-md-2\">Predicate</label><label class=\"col-md-8\">Groundings</label></div><ol id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-input-context-rules\" ></ol></div></div><div class=\"context-rules\"><label>Result Context Rules</label><div class=\"container\"><div class=\"row\"><label class=\"col-md-2\">Provider</label><label class=\"col-md-2\">Predicate</label><label class=\"col-md-8\">Groundings</label></div><ol id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-result-context-rules\" ></ol></div></div></div></span>");}body_0.__dustBody=!0;return body_0}(dust));
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(71)))
 
 /***/ },
-/* 109 */
+/* 110 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(dust) {module.exports = (function(dust){dust.register("components\/aggregation-rule-list\/dust\/aggregation-rule-list",body_0);function body_0(chk,ctx){return chk.w("<ul id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("\"></ul>");}body_0.__dustBody=!0;return body_0}(dust));
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(71)))
+
+/***/ },
+/* 111 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(dust) {"use strict";
@@ -31360,7 +31463,7 @@
 	    value: function render() {
 	      var _this2 = this;
 
-	      var template = __webpack_require__(110);
+	      var template = __webpack_require__(112);
 	      var defer = Bluebird.defer();
 
 	      dust.render(template, this._data, function (err, html) {
@@ -31438,14 +31541,14 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(71)))
 
 /***/ },
-/* 110 */
+/* 112 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(dust) {module.exports = (function(dust){dust.register("components\/get-module\/dust\/get-module",body_0);function body_0(chk,ctx){return chk.w("<div id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("\" class=\"get-module row\"><label class=\"col-md-2\">Get Module</label><input class=\"col-md-4\" type=\"text\" id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-module-text\" /><input type=\"button\" class=\"col-md-1\" value=\"test\" id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-module-test\"/><input type=\"button\" class=\"col-md-1\" value=\"get\" id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-module-get\" /><div id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-module-status\"></div></div>");}body_0.__dustBody=!0;return body_0}(dust));
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(71)))
 
 /***/ },
-/* 111 */
+/* 113 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(dust) {"use strict";
@@ -31478,7 +31581,7 @@
 	    value: function render() {
 	      var _this2 = this;
 
-	      var template = __webpack_require__(112);
+	      var template = __webpack_require__(114);
 	      var defer = Bluebird.defer();
 
 	      dust.render(template, this._data, function (err, html) {
@@ -31544,14 +31647,114 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(71)))
 
 /***/ },
-/* 112 */
+/* 114 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(dust) {module.exports = (function(dust){dust.register("components\/provider-maker\/dust\/provider-maker",body_0);function body_0(chk,ctx){return chk.w("<div id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("\" class=\"provider-maker\"><h3 class=\"\">Create Provider</h3><label>Module: <input class=\"\" type=\"text\" id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-provider-module\" /></label><label>Id: <input class=\"\" type=\"text\" id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-provider-id\" /></label><label>Persist: <input class=\"\" type=\"checkbox\" id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-provider-persist\" /></label><input type=\"button\" class=\"\" value=\"Make\" id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-provider-make\"/><label>Configuration: <textarea id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-provider-config\"></textarea></label><div id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-provider-status\"></div></div>");}body_0.__dustBody=!0;return body_0}(dust));
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(71)))
 
 /***/ },
-/* 113 */
+/* 115 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(dust) {"use strict";
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var $ = __webpack_require__(75);
+	var _ = __webpack_require__(100);
+	var Bluebird = __webpack_require__(102);
+	var uuid = __webpack_require__(104);
+
+	var TabList = (function () {
+	  function TabList(data) {
+	    var _this = this;
+
+	    _classCallCheck(this, TabList);
+
+	    this._data = _.extend(data, { _instanceId: uuid.v4().replace(/-/g, "") });
+	    this.element = null;
+	    this.hasTabs = false;
+	    this.initialized = this.render().then(function (element) {
+	      _this.element = element;
+	      return _this;
+	    });
+	  }
+
+	  _createClass(TabList, [{
+	    key: "render",
+	    value: function render() {
+	      var _this2 = this;
+
+	      var template = __webpack_require__(116);
+	      var defer = Bluebird.defer();
+
+	      dust.render(template, this._data, function (err, html) {
+	        if (err) {
+	          defer.reject(err);
+	          return;
+	        }
+	        defer.resolve(_this2._bind(html));
+	      });
+
+	      return defer.promise.then(function (element) {
+	        return _this2._inject(element);
+	      });
+	    }
+	  }, {
+	    key: "update",
+	    value: function update() {}
+	  }, {
+	    key: "hide",
+	    value: function hide() {}
+	  }, {
+	    key: "_bind",
+	    value: function _bind(html) {
+	      var element = $(html);
+	      return element;
+	    }
+	  }, {
+	    key: "_inject",
+	    value: function _inject(element) {
+	      return element;
+	    }
+	  }, {
+	    key: "_unload",
+	    value: function _unload() {}
+	  }, {
+	    key: "addTab",
+	    value: function addTab(name, urlName, content) {
+	      var li = $("<li><a data-toggle='tab' href='#" + urlName + "'>" + name + "</a></li>");
+	      var tabPane = $("<div id='" + urlName + "' class='tab-pane'></div>");
+
+	      if (!this.hasTabs) {
+	        li.attr("class", "active");
+	        tabPane = $("<div id='" + urlName + "' class='tab-pane active'></div>");
+	        this.hasTabs = true;
+	      }
+	      tabPane.append(content);
+	      $("#" + this._data._instanceId + "-tab-content").append(tabPane);
+	      $("#" + this._data._instanceId + "-tab-list").append(li);
+	    }
+	  }]);
+
+	  return TabList;
+	})();
+
+	module.exports = TabList;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(71)))
+
+/***/ },
+/* 116 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(dust) {module.exports = (function(dust){dust.register("components\/tab-list\/dust\/tab-list",body_0);function body_0(chk,ctx){return chk.w("<div id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("\"><ul id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-tab-list\" class=\"nav nav-tabs list-inline\"></ul><div id=\"").f(ctx.get(["_instanceId"], false),ctx,"h").w("-tab-content\" class=\"tab-content\"></div></div>");}body_0.__dustBody=!0;return body_0}(dust));
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(71)))
+
+/***/ },
+/* 117 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(dust) {module.exports = (function(dust){dust.register("views\/providers",body_0);function body_0(chk,ctx){return chk.w("Providers<ul>").s(ctx.get(["providers"], false),ctx,{"block":body_1},{}).w("</ul>");}body_0.__dustBody=!0;function body_1(chk,ctx){return chk.w("<li>").f(ctx.getPath(true, []),ctx,"h").w("</li>");}body_1.__dustBody=!0;return body_0}(dust));
