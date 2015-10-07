@@ -28,7 +28,6 @@
     "rx": "^3.1.2",
     "smart-agg": "^1.0.3",
     "smart-agg-adapter-http-basic": "^1.0.0",
-    "smart-agg-fs-writer": "^1.0.1",
     "style-loader": "^0.12.4",
     "url-loader": "^0.5.6",
     "uuid": "^2.0.1",
