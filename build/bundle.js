@@ -31630,10 +31630,11 @@
 	      $("#" + this._data._instanceId + "-provider-status").html("Making");
 	      var id = $("#" + this._data._instanceId + "-provider-id").val();
 	      var mod = $("#" + this._data._instanceId + "-provider-module").val();
-	      var persist = $("#" + this._data._instanceId + "-provider-persist").val() === "on";
+	      var persist = $("#" + this._data._instanceId + "-provider-persist").is(':checked');
 	      var config = $("#" + this._data._instanceId + "-provider-config").val();
+	      console.log(persist);
 	      $.post("/instances/" + id, { id: id, module: mod, persist: persist, config: JSON.parse(config) }).success(function () {
-	        window.location.reload();
+	        //window.location.reload();
 	      }).fail(function (err) {
 	        $("#" + _this4._data._instanceId + "-provider-status").html(err.responseText || err.message || err);
 	      });
